@@ -1,1 +1,20 @@
-Hello World
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+  let socket = io()
+
+  let binks = function() {
+
+    socket.emit('binks',{
+      reason:"c\'est carré chacal"
+    })
+
+  }
+
+  socket.on('serverMsg', function(data){
+    console.log(data.msg)
+  })
+
+</script>
+
+<button onclick="binks()">Le Binks</button>
