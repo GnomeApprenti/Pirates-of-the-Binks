@@ -1,4 +1,3 @@
-
 //////////////////////////////////////////
 //initializing server
 //////////////////////////////////////////
@@ -168,6 +167,9 @@ Bullet.update = function(){
 //////////////////////////////////////////
 
 //defining socket's parameters and adding it to the socket list
+
+const DEBUG = true
+
 let io = require('socket.io')(serv, {})
 io.sockets.on('connection', function(socket){
 
@@ -181,6 +183,22 @@ io.sockets.on('connection', function(socket){
   socket.on('disconnect',function(){
     delete SOCKET_LIST[socket.id]
     Player.onDisconnect(socket)
+  })
+
+  socket.on('sendMsgToServer',function(data){
+    let playerName = ("" + socket.id).slice(2,7)
+    for(var i in SOCKET_LIST){
+      SOCKET_LIST[i].emit('addToChat',playerName + ': ' + data)
+    }
+  })
+  socket.on('evalServer',function(data){
+    if(!DEBUG)
+      return
+    else{
+      let result = eval(data)
+      socket.emit('evalAnswer',result)
+    }
+
   })
 
 })
