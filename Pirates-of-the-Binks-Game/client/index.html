@@ -1,16 +1,68 @@
-<canvas id="ctx" width="500" height="500" style="border:1px solid #000000"></canvas>
-
-<div id="chat-text" style="width:500px;height:100px;overflow-y:scroll">
-  <div>Chat du Binks</div>
+<div id='signDiv'>
+  Username: <input id="signDiv-username" type="text">
+  Password: <input id="signDiv-password" type="password">
+  <button id="signDiv-signIn" >Sign In</button>
+  <button id="signDiv-signUp" >Sign Up</button>
 </div>
 
-<form id="chat-form">
-  <input id="chat-input" type="text" style = "width:500px"></input>
-</form>
+<div id="gameDiv" style="display:none;">
+
+  <canvas id="ctx" width="500" height="500" style="border:1px solid #000000"></canvas>
+
+  <div id="chat-text" style="width:500px;height:100px;overflow-y:scroll">
+    <div>Chat du Binks</div>
+  </div>
+
+  <form id="chat-form">
+    <input id="chat-input" type="text" style = "width:500px"></input>
+  </form>
+
+</div>
 
 <script src="/socket.io/socket.io.js"></script>
 
 <script>
+  let socket = io()
+
+  //////////////////////////////////////////
+  //sign in
+  //////////////////////////////////////////
+
+  let signDiv = document.getElementById('signDiv')
+  let signDivUsername = document.getElementById('signDiv-username')
+  let signDivPassword = document.getElementById('signDiv-password')
+  let signDivSignIn = document.getElementById('signDiv-signIn')
+  let signDivSignUp = document.getElementById('signDiv-signUp')
+
+  signDivSignIn.onclick = function(){
+    socket.emit('signIn', {username:signDivUsername.value, password:signDivPassword.value})
+  }
+  signDivSignUp.onclick = function(){
+    socket.emit('signUp', {username:signDivUsername.value, password:signDivPassword.value})
+  }
+
+  socket.on('signInResponse', function(data){
+    if(data.success){
+      signDiv.style.display = 'none'
+      gameDiv.style.display = 'inline-block'
+    }
+    else {
+      alert("Sign in unsuccessful")
+    }
+  })
+
+  socket.on('signUpResponse', function(data){
+    if(data.success){
+      alert("Sign up successful")
+    }
+    else {
+      alert("Sign up unsuccessful")
+    }
+  })
+
+  //////////////////////////////////////////
+  //game
+  //////////////////////////////////////////
 
   let chatText = document.getElementById("chat-text")
   let chatInput = document.getElementById("chat-input")
@@ -21,7 +73,6 @@
   const WIDTH = 500
   const HEIGHT = 500
 
-  let socket = io()
 
   //when client gets a position update
   socket.on('newPositions', function(data){

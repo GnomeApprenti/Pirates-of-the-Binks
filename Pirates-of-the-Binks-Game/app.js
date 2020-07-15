@@ -80,8 +80,10 @@ let Player = function(id){
     var b = Bullet(self.id,angle)
     b.x = self.x
     b.y = self.y
-    b.spdX += self.spdX
-    b.spdY += self.spdY
+    if(self.spdX >= 0){
+      b.spdX += self.spdX
+      b.spdY += self.spdY
+    }
   }
 
   self.updateSpd = function(){
@@ -202,15 +204,60 @@ Bullet.update = function(){
 
 const DEBUG = true
 
+let USERS = {
+  "bob":"asd",
+
+}
+
+let isValidPassword = function(data,cb){
+  setTimeout(function(){
+    cb(USERS[data.username] === data.password)
+  },10)
+}
+
+let isUsernameTaken = function(data,cb){
+  setTimeout(function(){
+    cb(USERS[data.username])
+  },10)
+}
+
+let addUser = function(data,cb){
+  setTimeout(function(){
+    USERS[data.username] = data.password
+    cb()
+  },10)
+}
+
 let io = require('socket.io')(serv, {})
 io.sockets.on('connection', function(socket){
+  console.log("socket connection. id : " + socket.id)
 
   socket.id = Math.random()
   SOCKET_LIST[socket.id] = socket
 
-  Player.onConnect(socket)
+  socket.on('signIn',function(data){
+    isValidPassword(data,function(res){
+      if(res){
+        Player.onConnect(socket)
+        socket.emit('signInResponse',{success:true})
+      } else {
+        socket.emit('signInResponse',{success:false})
+      }
+    })
+  })
 
-  console.log("socket connection. id : " + socket.id)
+  socket.on('signUp',function(data){
+    isUsernameTaken(data,function(res){
+      if(res){
+        socket.emit('signUpResponse',{success:false})
+      }else{
+        addUser(data,function(){
+          socket.emit('signUpResponse',{success:true})
+        })
+      }
+    })
+  })
+
 
   socket.on('disconnect',function(){
     delete SOCKET_LIST[socket.id]
