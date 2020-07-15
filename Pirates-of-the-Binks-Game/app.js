@@ -2,6 +2,9 @@
 //initializing server
 //////////////////////////////////////////
 
+let mongojs = require("mongojs")
+let db = mongojs('localhost:27017/PiratesOfTheBinks', ['account','progress'])
+
 let express = require('express')
 let app = express()
 let serv = require('http').Server(app)
@@ -210,22 +213,29 @@ let USERS = {
 }
 
 let isValidPassword = function(data,cb){
-  setTimeout(function(){
-    cb(USERS[data.username] === data.password)
-  },10)
+  db.account.find({username:data.username,password:data.password},function(err,res){
+    if(res.length > 0){
+      cb(true)
+    } else {
+      cb(false)
+    }
+  })
 }
 
 let isUsernameTaken = function(data,cb){
-  setTimeout(function(){
-    cb(USERS[data.username])
-  },10)
+  db.account.find({username:data.username},function(err,res){
+    if(res.length > 0){
+      cb(true)
+    } else {
+      cb(false)
+    }
+  })
 }
 
 let addUser = function(data,cb){
-  setTimeout(function(){
-    USERS[data.username] = data.password
+  db.account.insert({username:data.username,password:data.password},function(err){
     cb()
-  },10)
+  })
 }
 
 let io = require('socket.io')(serv, {})
