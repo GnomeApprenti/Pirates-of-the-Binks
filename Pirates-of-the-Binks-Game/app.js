@@ -105,6 +105,12 @@ let Player = function(id){
       self.spdY = 0
   }
   Player.list[id] = self
+  initPack.player.push({
+    id:self.id,
+    x:self.x,
+    y:self.y,
+    number:self.number,
+  })
   return self
 
 }
@@ -131,6 +137,7 @@ Player.onConnect = function(socket){
 
 Player.onDisconnect = function(socket){
   delete Player.list[socket.id]
+  removePack.player.push(socket.id)
 }
 
 Player.update = function(){
@@ -144,7 +151,7 @@ Player.update = function(){
     pack.push({
       x:player.x,
       y:player.y,
-      number:player.number
+      id:player.id
     })
   }
   return pack;
@@ -175,6 +182,11 @@ let Bullet = function(parent, angle){
     }
   }
   Bullet.list[self.id] = self
+  initPack.bullet.push({
+    id:self.id,
+    x:self.x,
+    y:self.y,
+  })
   return self
 }
 
@@ -189,13 +201,16 @@ Bullet.update = function(){
 
     bullet.update()
 
-    if(bullet.toRemove)
+    if(bullet.toRemove){
       delete Bullet.list[i]
-
-    pack.push({
-      x:bullet.x,
-      y:bullet.y,
-    })
+      removePack.bullet.push(bullet.id)
+    } else {
+      pack.push({
+        x:bullet.x,
+        y:bullet.y,
+        id:bullet.id
+      })
+    }
   }
   return pack;
 }
@@ -292,7 +307,10 @@ io.sockets.on('connection', function(socket){
 
 })
 
-//updating socket's parameters and sending them to client
+let initPack = {player:[],bullet:[]}
+let removePack = {player:[],bullet:[]}
+
+//update
 setInterval(function(){
   let pack = {
     player:Player.update(),
@@ -301,7 +319,13 @@ setInterval(function(){
 
   for(let i in SOCKET_LIST){
     let socket = SOCKET_LIST[i]
-    socket.emit('newPositions',pack)
+    socket.emit('update',pack)
+    socket.emit('init',initPack)
+    socket.emit('remove',removePack)
   }
+  initPack.player = []
+  initPack.bullet = []
+  removePack.player = []
+  removePack.bullet = []
 
 },1000/25)

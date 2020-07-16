@@ -64,26 +64,10 @@
   //game
   //////////////////////////////////////////
 
+  //chat
   let chatText = document.getElementById("chat-text")
   let chatInput = document.getElementById("chat-input")
   let chatForm = document.getElementById("chat-form")
-  let ctx = document.getElementById("ctx").getContext("2d")
-  ctx.font = "30px Arial"
-
-  const WIDTH = 500
-  const HEIGHT = 500
-
-
-  //when client gets a position update
-  socket.on('newPositions', function(data){
-    ctx.clearRect(0,0,WIDTH,HEIGHT)
-    for(let i = 0 ; i < data.player.length; i++){
-      ctx.fillText(data.player[i].number, data.player[i].x, data.player[i].y)
-    }
-    for(let i = 0 ; i < data.bullet.length; i++){
-      ctx.fillRect(data.bullet[i].x-5, data.bullet[i].y-5,10,10)
-    }
-  })
 
   socket.on('addToChat', function(data){
     chatText.innerHTML += '<div>' + data + '<div>'
@@ -100,6 +84,90 @@
       socket.emit('sendMsgToServer',chatInput.value)
     chatInput.value = ""
   }
+
+  let ctx = document.getElementById("ctx").getContext("2d")
+  ctx.font = "30px Arial"
+
+  const WIDTH = 500
+  const HEIGHT = 500
+
+  //init
+
+  let Player = function(initPack){
+    let self = {}
+    self.id = initPack.id
+    self.number = initPack.number
+    self.x = initPack.x
+    self.y = initPack.y
+    Player.list[self.id] = self
+  }
+  Player.list = {}
+
+  let Bullet = function(initPack){
+    let self = {}
+    self.id = initPack.id
+    self.x = initPack.x
+    self.y = initPack.y
+    Bullet.list[self.id] = self
+  }
+  Bullet.list = {}
+
+  socket.on('init', function(data){
+    for(let i = 0 ; i < data.player.length; i++){
+      new Player(data.player[i])
+    }
+    for(let i = 0 ; i < data.bullet.length; i++){
+      new Bullet(data.bullet[i])
+    }
+  })
+
+  //update
+
+  socket.on('update',function(data){
+    for(let i = 0 ; i < data.player.length ; i++){
+      let pack = data.player[i]
+      let p = Player.list[pack.id]
+      if(p){
+        if(pack.x !== undefined)
+          p.x = pack.x
+        if(pack.y !== undefined)
+          p.y = pack.y
+      }
+    }
+
+    for(let i = 0 ; i < data.bullet.length ; i++){
+      let pack = data.bullet[i]
+      let p = Bullet.list[pack.id]
+      if(p){
+        if(pack.x !== undefined)
+          p.x = pack.x
+        if(pack.y !== undefined)
+          p.y = pack.y
+      }
+    }
+  })
+
+  //remove
+
+  socket.on('remove',function(data){
+    for(let i = 0 ; i < data.player.length ; i++){
+      delete Player.list[data.player[i]]
+    }
+    for(let i = 0 ; i < data.bullet.length ; i++){
+      delete Bullet.list[data.bullet[i]]
+    }
+  })
+
+  //draw
+
+  setInterval(function(){
+    ctx.clearRect(0,0,WIDTH,HEIGHT)
+    for(let i in Player.list)
+      ctx.fillText(Player.list[i].number,Player.list[i].x,Player.list[i].y)
+    for(let i in Player.list)
+      ctx.fillRect(Bullet.list[i].x-5, Bullet.list[i].y-5,10,10)
+
+  },40)
 
   //input
   document.onkeydown = function(event){
