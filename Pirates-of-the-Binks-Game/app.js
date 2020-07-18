@@ -65,6 +65,9 @@ let Player = function(id){
   self.pressingAttack = false
   self.mouseAngle = 0
   self.maxSpd = 10
+  self.hp = 10
+  self.hpMax = 10
+  self.score = 0
 
   let super_update = self.update
   self.update = function(){
@@ -104,13 +107,34 @@ let Player = function(id){
     else
       self.spdY = 0
   }
+
+  self.getInitPack = function(){
+    return{
+      id:self.id,
+      x:self.x,
+      y:self.y,
+      number:self.number,
+      hp:self.hp,
+      hpMax:self.hpMax,
+      score:self.score,
+    }
+  }
+
+  self.getUpdatePack = function(){
+    return {
+      id:self.id,
+      x:self.x,
+      y:self.y,
+      number:self.number,
+      hp:self.hp,
+      score:self.score,
+    }
+  }
+
   Player.list[id] = self
-  initPack.player.push({
-    id:self.id,
-    x:self.x,
-    y:self.y,
-    number:self.number,
-  })
+
+  initPack.player.push(self.getInitPack())
+
   return self
 
 }
@@ -133,6 +157,18 @@ Player.onConnect = function(socket){
     else if (data.inputId === 'mouseAngle')
       player.mouseAngle = data.state
   })
+
+  socket.emit('init',{
+    player:Player.getAllInitPack(),
+    bullet:Bullet.getAllInitPack(),
+  })
+}
+
+Player.getAllInitPack = function(){
+  let players = []
+  for(let i in Player.list)
+    players.push(Player.list[i].getInitPack())
+  return players
 }
 
 Player.onDisconnect = function(socket){
@@ -148,11 +184,7 @@ Player.update = function(){
 
     player.update()
 
-    pack.push({
-      x:player.x,
-      y:player.y,
-      id:player.id
-    })
+    pack.push(player.getUpdatePack())
   }
   return pack;
 }
@@ -176,17 +208,44 @@ let Bullet = function(parent, angle){
     for(let i in Player.list){
       let p = Player.list[i]
       if(self.getDistance(p) < 32 && self.parent !== p.id){
-        console.log("collision");
+
+        p.hp -=1
+
+        if(p.hp <= 0) {
+
+          let shooter = Player.list[self.parent]
+
+          if(shooter)
+            shooter.score += 1
+
+          p.hp = p.hpMax
+          p.x = Math.random() * 500
+          p.y = Math.random() * 500
+        }
+
         self.toRemove = true
       }
     }
   }
+
+  self.getInitPack = function(){
+    return{
+      id:self.id,
+      x:self.x,
+      y:self.y,
+    }
+  }
+
+  self.getUpdatePack = function(){
+    return {
+      id:self.id,
+      x:self.x,
+      y:self.y,
+    }
+  }
+
   Bullet.list[self.id] = self
-  initPack.bullet.push({
-    id:self.id,
-    x:self.x,
-    y:self.y,
-  })
+  initPack.bullet.push(self.getInitPack())
   return self
 }
 
@@ -205,20 +264,22 @@ Bullet.update = function(){
       delete Bullet.list[i]
       removePack.bullet.push(bullet.id)
     } else {
-      pack.push({
-        x:bullet.x,
-        y:bullet.y,
-        id:bullet.id
-      })
+      pack.push(bullet.getUpdatePack())
     }
   }
   return pack;
 }
+
+Bullet.getAllInitPack = function(){
+  let bullets = []
+  for(let i in Bullet.list)
+    bullets.push(Bullet.list[i].getInitPack())
+  return bullets
+}
+
 //////////////////////////////////////////
 //interactions on connection
 //////////////////////////////////////////
-
-//defining socket's parameters and adding it to the socket list
 
 const DEBUG = true
 
