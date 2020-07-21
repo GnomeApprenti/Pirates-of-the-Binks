@@ -20,7 +20,7 @@
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
-
+<script src="/client/js/main.js"></script>
 <script>
   let socket = io()
 
@@ -69,8 +69,11 @@
   Img.player.src = '/client/img/boat.png'
   Img.bullet = new Image()
   Img.bullet.src = '/client/img/bullet.png'
-  Img.map = new Image()
-  Img.map.src = 'client/img/sea.png'
+  Img.map = {}
+  Img.map['sea'] = new Image()
+  Img.map['sea'].src = 'client/img/sea.png'
+  Img.map['coast'] = new Image()
+  Img.map['coast'].src = 'client/img/coast.png'
 
   //chat
   let chatText = document.getElementById("chat-text")
@@ -110,8 +113,12 @@
     self.hp = initPack.hp
     self.hpMax = initPack.hpMax
     self.score = initPack.score
+    self.map = initPack.map
 
     self.draw = function(){
+      if(Player.list[selfId].map !== self.map)
+        return
+
       let hpWidth = 30 * self.hp / self.hpMax
 
       let width = Img.player.width
@@ -138,8 +145,12 @@
     self.id = initPack.id
     self.x = initPack.x
     self.y = initPack.y
+    self.map = initPack.map
 
     self.draw = function(){
+      if(Player.list[selfId].map !== self.map)
+        return
+
       let width = Img.bullet.width/2
       let height = Img.bullet.height/2
 
@@ -229,9 +240,10 @@
   },40)
 
   let drawMap = function(){
-    let x = WIDTH/2 - Player.list[selfId].x
-    let y = HEIGHT/2 - Player.list[selfId].y
-    ctx.drawImage(Img.map,x,y)
+    let player = Player.list[selfId]
+    let x = WIDTH/2 - player.x
+    let y = HEIGHT/2 - player.y
+    ctx.drawImage(Img.map[player.map],x,y)
   }
 
   let drawScore = function(){
