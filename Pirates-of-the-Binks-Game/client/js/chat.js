@@ -14,7 +14,12 @@ chatForm.onsubmit = function(e){
   e.preventDefault()
   if(chatInput.value[0] === '/')
     socket.emit('evalServer',chatInput.value.slice(1))
-  else
+  else if(chatInput.value[0] === '@'){
+    socket.emit('sendPmToServer',{
+      username:chatInput.value.slice(1,chatInput.value.indexOf(',')),
+      message:chatInput.value.slice(chatInput.value.indexOf(',') + 1),
+    })
+  } else
     socket.emit('sendMsgToServer',chatInput.value)
   chatInput.value = ""
 }

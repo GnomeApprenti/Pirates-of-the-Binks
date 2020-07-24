@@ -79,6 +79,7 @@ let Player = function(param){
   self.hp = 10
   self.hpMax = 10
   self.score = 0
+  self.username = param.username
 
   let super_update = self.update
   self.update = function(){
@@ -157,11 +158,12 @@ let Player = function(param){
 
 }
 Player.list = {}
-Player.onConnect = function(socket){
+Player.onConnect = function(socket,username){
   let map = 'sea'
   if(Math.random() < 0.5)
     map = 'coast'
   let player = Player({
+    username:username,
     id:socket.id,
     map:map,
   })
@@ -186,6 +188,25 @@ Player.onConnect = function(socket){
       player.map = 'coast'
     else {
       player.map = 'sea'
+    }
+  })
+
+  socket.on('sendMsgToServer',function(data){
+    for(var i in SOCKET_LIST){
+      SOCKET_LIST[i].emit('addToChat',player.username + ': ' + data)
+    }
+  })
+
+  socket.on('sendPmToServer',function(data){
+    let recipientSocket = null
+    for(let i in Player.list)
+      if(Player.list[i].username === data.username)
+        recipientSocket = SOCKET_LIST[i]
+    if(recipientSocket === null){
+      socket.emit('addToChat', 'The player ' + data.username + ' is not online.')
+    } else {
+      recipientSocket.emit('addToChat','From ' + player.username + ': ' + data.message)
+      socket.emit('addToChat','To ' + data.username + ': ' + data.message)
     }
   })
 
@@ -358,7 +379,7 @@ io.sockets.on('connection', function(socket){
   socket.on('signIn',function(data){
     isValidPassword(data,function(res){
       if(res){
-        Player.onConnect(socket)
+        Player.onConnect(socket,data.username)
         socket.emit('signInResponse',{success:true})
       } else {
         socket.emit('signInResponse',{success:false})
@@ -384,12 +405,6 @@ io.sockets.on('connection', function(socket){
     Player.onDisconnect(socket)
   })
 
-  socket.on('sendMsgToServer',function(data){
-    let playerName = ("" + socket.id).slice(2,7)
-    for(var i in SOCKET_LIST){
-      SOCKET_LIST[i].emit('addToChat',playerName + ': ' + data)
-    }
-  })
   socket.on('evalServer',function(data){
     if(!DEBUG)
       return

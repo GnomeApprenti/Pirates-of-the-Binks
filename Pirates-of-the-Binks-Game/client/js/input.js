@@ -38,3 +38,7 @@ document.onmousemove = function(event){
   let angle = Math.atan2(y,x) / Math.PI * 180
   socket.emit('keyPress',{inputId:'mouseAngle',state:angle})
 }
+
+document.oncontextmenu = function(event){
+  event.preventDefault
+}
