@@ -145,6 +145,7 @@ let Player = function(param){
       number:self.number,
       hp:self.hp,
       score:self.score,
+      map:self.map,
     }
   }
 
@@ -178,6 +179,14 @@ Player.onConnect = function(socket){
       player.pressingAttack= data.state
     else if (data.inputId === 'mouseAngle')
       player.mouseAngle = data.state
+  })
+
+  socket.on('changeMap',function(data){
+    if(player.map === 'sea')
+      player.map = 'coast'
+    else {
+      player.map = 'sea'
+    }
   })
 
   socket.emit('init',{

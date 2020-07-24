@@ -17,6 +17,9 @@ socket.on('update',function(data){
       if(pack.score !== undefined)
         p.score = pack.score
 
+      if(pack.map !== undefined)
+        p.map = pack.map
+
     }
   }
 

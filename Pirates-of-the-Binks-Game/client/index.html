@@ -7,16 +7,31 @@
 
 <div id="gameDiv" style="display:none;">
 
-    <canvas id="ctx" width="500" height="500" style="position:absolute; left:8px;top:8px; border:1px solid #000000"></canvas>
-    <canvas id="ctx-ui" width="500" height="500" style="position:absolute; left:8px;top:8px; border:1px solid #000000"></canvas>
+    <div id='game' style='positon:absolute;width:500px;height:500px'>
 
-    <div id="chat-text" style="width:500px; margin-top:508px;height:100px;overflow-y:scroll">
-        <div>Chat</div>
+      <canvas id="ctx" width="500" height="500" style="position:absolute; border:1px solid #000000"></canvas>
+      <canvas id="ctx-ui" width="500" height="500" style="position:absolute; border:1px solid #000000"></canvas>
+
+      <div id="ui" style="position:absolute;width:500px;height:500px;">
+
+        <button onclick="changeMap()" style="position:absolute;bottom:0px;left:0px">
+          Change map
+        </button>
+
+      </div>
+
     </div>
+    <div id='belowGame' style='margin-top:20px'>
 
-  <form id="chat-form">
-    <input id="chat-input" type="text" style = "width:500px"></input>
-  </form>
+      <div id="chat-text" style="width:500px;height:100px;overflow-y:scroll">
+          <div>Chat</div>
+      </div>
+
+      <form id="chat-form">
+        <input id="chat-input" type="text" style = "width:500px"></input>
+      </form>
+
+    </div>
 
 </div>
 
@@ -30,6 +45,7 @@
 <script src="/client/js/remove.js"></script>
 <script src="/client/js/signin.js"></script>
 <script src="/client/js/update.js"></script>
+<script src="/client/js/ui.js"></script>
 
 <script>
 
