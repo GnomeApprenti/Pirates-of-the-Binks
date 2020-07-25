@@ -2,7 +2,7 @@
 //player and entity class
 //////////////////////////////////////////
 
-let SOCKET_LIST = {}
+SOCKET_LIST = {}
 
 let initPack = {player:[],bullet:[]}
 let removePack = {player:[],bullet:[]}
@@ -56,12 +56,12 @@ Entity.getFrameUpdateData = function(){
       bullet:initPack.bullet,
     },
     removePack:{
-      player.removePack.player,
-      bullet.removePack.bullet,
+      player:removePack.player,
+      bullet:removePack.bullet,
     },
     updatePack:{
-      player:updatePack.player,
-      bullet:updatePack.bullet,
+      player:Player.update(),
+      bullet:Bullet.update(),
     }
   }
 
