@@ -6,6 +6,7 @@ let mongojs = require("mongojs")
 let db = mongojs('localhost:27017/PiratesOfTheBinks', ['account','progress'])
 
 require('./entity.js')
+require('./client/js/inventory.js')
 
 let express = require('express')
 let app = express()

@@ -2,6 +2,7 @@
 //player and entity class
 //////////////////////////////////////////
 
+
 SOCKET_LIST = {}
 
 let initPack = {player:[],bullet:[]}
@@ -88,6 +89,7 @@ Player = function(param){
   self.hpMax = 10
   self.score = 0
   self.username = param.username
+  self.inventory = new Inventory(param.socket)
 
   let super_update = self.update
   self.update = function(){
@@ -174,6 +176,7 @@ Player.onConnect = function(socket,username){
     username:username,
     id:socket.id,
     map:map,
+    socket:socket,
   })
 
   socket.on('keyPress', function(data){
