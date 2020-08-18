@@ -1,8 +1,9 @@
-Inventory = function(socket){
+Inventory = function(socket,server){
 
   let self = {
     items:[],
     socket:socket,
+    server:server,
   }
 
   self.addItem = function(id,amount){
@@ -39,23 +40,39 @@ Inventory = function(socket){
   }
 
   self.refreshRenderer = function(){
-    if(self.socket){
+
+    if(self.server){
       self.socket.emit('updateInventory',self.items)
+
+      self.socket.on("useItem",function(itemId){/*
+        if(!self.hasItem(itemId,1)){
+          console.log("Cheater")
+          return
+        }*/
+        let item = Item.list[itemId]
+        item.event(Player.list[self.socket.id])
+      })
       return
     }
-    let str = ""
-    for(let i = 0; i<self.items.length; i++){
-      let item = Item.List[self.items[i].id]
-      let onclick = "Item.list['" + item.id + "'].event()"
-      str += "<button onclick = \" + onclick + \">" + item.name + " x" + self.items[i].amount + "</button><br> "
+
+    let inventory = document.getElementById("inventory")
+    inventory.innerHTML = ""
+
+    let addButton = function(data){
+      let item = Item.list[data.id]
+      let button = document.createElement('button')
+      button.innerText = item.name + " x" + data.amount
+      inventory.appendChild(button)
+      button.onclick = function(){
+        self.socket.emit("useItem",item.id)
+      }
     }
-    document.getElementById("inventory").innerHTML = str
+    for(let i = 0; i<self.items.length; i++){
+      addButton(self.items[i])
+    }
   }
-
   return self
-
 }
-
 
 Item = function(id,name,event){
   let self = {
@@ -63,12 +80,21 @@ Item = function(id,name,event){
     name:name,
     event:event,
   }
-  Item.List[self.id] = self
+  Item.list[self.id] = self
   return self
 }
-Item.List = {}
+Item.list = {}
 
-Item("plank","Plank",function(){
+Item("plank","Plank",function(player){
   player.hp = 10
-  playerInventory.removeItem("potion",1)
+  player.inventory.removeItem("plank",1)
+  player.inventory.addItem("superAttack",1)
+})
+
+Item("superAttack","Attaque de la Moula",function(player){
+  for(let i = 0; i <360; i++){
+    player.shootBullet(i)
+  }
+
+  player.inventory.removeItem("superAttack",1)
 })

@@ -89,23 +89,23 @@ Player = function(param){
   self.hpMax = 10
   self.score = 0
   self.username = param.username
-  self.inventory = new Inventory(param.socket)
+  self.inventory = new Inventory(param.socket,true)
 
   let super_update = self.update
   self.update = function(){
     self.updateSpd()
     super_update()
 
-
     if(self.pressingAttack){
       self.shootBullet(self.mouseAngle)
     }
 
-
   }
 
   self.shootBullet = function(angle){
-    var b = Bullet({
+    if(Math.random() <0.1)
+      self.inventory.addItem("plank",1)
+    Bullet({
       parent:self.id,
       angle:angle,
       x:self.x,
@@ -113,10 +113,6 @@ Player = function(param){
       map:self.map,
     })
 
-    if(self.spdX >= 0){
-      b.spdX += self.spdX
-      b.spdY += self.spdY
-    }
   }
 
   self.updateSpd = function(){
