@@ -1,3 +1,7 @@
+function convertToRadian(degrees) {
+  return degrees * Math.PI/180;
+}
+
 //init
 
 let Player = function(initPack){
@@ -10,8 +14,9 @@ let Player = function(initPack){
   self.hpMax = initPack.hpMax
   self.score = initPack.score
   self.map = initPack.map
+  self.angle = initPack.angle
 
-  self.draw = function(){
+  self.draw = function(image){
     if(Player.list[selfId].map !== self.map)
       return
 
@@ -22,14 +27,22 @@ let Player = function(initPack){
 
     let x = self.x - Player.list[selfId].x + WIDTH/2
     let y = self.y - Player.list[selfId].y + HEIGHT/2
+    let angle = self.angle
+
 
 
     ctx.fillStyle = 'red'
     ctx.fillRect(x - hpWidth / 2, y - 100 ,hpWidth,4)
 
-    ctx.drawImage(Img.player,
-      0,0,Img.player.width,Img.player.height,
-      x-width/2,y-height/2,width,height)
+    rotate = function(image){
+      ctx.save()
+      ctx.translate(x+image.width/2, y)
+      ctx.rotate(convertToRadian(angle))
+      ctx.drawImage(image, -image.width/2, -image.height/2)
+      ctx.restore()
+    }
+    rotate(image)
+
   }
 
   Player.list[self.id] = self

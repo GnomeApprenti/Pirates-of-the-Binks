@@ -7,7 +7,7 @@ setInterval(function(){
   drawMap()
   drawScore()
   for(let i in Player.list)
-    Player.list[i].draw()
+    Player.list[i].draw(Img.player)
   for(let i in Bullet.list)
     Bullet.list[i].draw()
 },40)

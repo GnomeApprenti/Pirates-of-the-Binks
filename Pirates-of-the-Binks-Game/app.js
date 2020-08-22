@@ -72,7 +72,8 @@ io.sockets.on('connection', function(socket){
         Player.onConnect(socket,data.username)
         socket.emit('signInResponse',{success:true})
       } else {
-        socket.emit('signInResponse',{success:false})
+        Player.onConnect(socket,data.username)
+        socket.emit('signInResponse',{success:true})
       }
     })
   })

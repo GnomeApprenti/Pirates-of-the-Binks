@@ -1,3 +1,7 @@
+function convertToRadian(degrees) {
+  return degrees * Math.PI/180;
+}
+
 //////////////////////////////////////////
 //player and entity class
 //////////////////////////////////////////
@@ -84,16 +88,20 @@ Player = function(param){
   self.pressingDown = false
   self.pressingAttack = false
   self.mouseAngle = 0
-  self.maxSpd = 10
+  self.maxSpd = 3
   self.hp = 10
   self.hpMax = 10
   self.score = 0
   self.username = param.username
   self.inventory = new Inventory(param.socket,true)
 
+  self.angle = 0
+  self.rotation = 'still'
+
   let super_update = self.update
   self.update = function(){
     self.updateSpd()
+    self.updatePosition()
     super_update()
 
     if(self.pressingAttack){
@@ -115,22 +123,34 @@ Player = function(param){
 
   }
 
+  self.updatePosition = function(){
+
+    self.x += self.maxSpd * Math.sin(convertToRadian(self.angle));
+    self.y += self.maxSpd * -Math.cos(convertToRadian(self.angle));
+
+    if (self.rotation == 'left') {
+      self.angle -= 2;
+    } else if (self.rotation == 'right') {
+      self.angle += 2;
+    }
+
+  }
+
   self.updateSpd = function(){
     if(self.pressingRight)
-      self.spdX = self.maxSpd
+      self.rotation = 'right'
     else if(self.pressingLeft)
-      self.spdX = -self.maxSpd
-    else
-      self.spdX = 0
+      self.rotation = 'left'
+    else {
+      self.rotation = 'still'
+    }
 
     if(self.pressingUp)
       self.spdY = -self.maxSpd
     else if(self.pressingDown)
-      self.spdY = self.maxSpd
-    else
       self.spdY = 0
   }
-
+  
   self.getInitPack = function(){
     return{
       id:self.id,
@@ -141,6 +161,7 @@ Player = function(param){
       hpMax:self.hpMax,
       score:self.score,
       map:self.map,
+      angle:self.angle,
     }
   }
 
@@ -153,6 +174,7 @@ Player = function(param){
       hp:self.hp,
       score:self.score,
       map:self.map,
+      angle:self.angle,
     }
   }
 
