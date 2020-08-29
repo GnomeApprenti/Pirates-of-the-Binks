@@ -88,12 +88,12 @@ Player = function(param){
   self.pressingDown = false
   self.pressingAttack = false
   self.mouseAngle = 0
-  self.maxSpd = 3
+  self.maxSpd = 0
   self.hp = 10
   self.hpMax = 10
   self.score = 0
   self.username = param.username
-  self.inventory = new Inventory(param.socket,true)
+  self.inventory = new Inventory(param.progress.items,param.socket,true)
 
   self.angle = 0
   self.rotation = 'still'
@@ -146,11 +146,11 @@ Player = function(param){
     }
 
     if(self.pressingUp)
-      self.spdY = -self.maxSpd
+      self.maxSpd = 3
     else if(self.pressingDown)
-      self.spdY = 0
+      self.maxSpd = 0
   }
-  
+
   self.getInitPack = function(){
     return{
       id:self.id,
@@ -186,7 +186,7 @@ Player = function(param){
 
 }
 Player.list = {}
-Player.onConnect = function(socket,username){
+Player.onConnect = function(socket,username,progress){
   let map = 'sea'
   if(Math.random() < 0.5)
     map = 'coast'
@@ -195,7 +195,10 @@ Player.onConnect = function(socket,username){
     id:socket.id,
     map:map,
     socket:socket,
+    progress:progress,
   })
+
+  player.inventory.refreshRenderer()
 
   socket.on('keyPress', function(data){
     if (data.inputId === 'left')
@@ -254,7 +257,14 @@ Player.getAllInitPack = function(){
 }
 
 Player.onDisconnect = function(socket){
-  delete Player.list[socket.id]
+  let player = Player.list[socket.id]
+  if(!player)
+    return
+  Database.savePlayerProgress({
+    username:player.username,
+    items:player.inventory.items,
+  })
+  delete player
   removePack.player.push(socket.id)
 }
 

@@ -14,9 +14,14 @@ setInterval(function(){
 
 let drawMap = function(){
   let player = Player.list[selfId]
+  image = Img.map[player.map]
   let x = WIDTH/2 - player.x
   let y = HEIGHT/2 - player.y
-  ctx.drawImage(Img.map[player.map],x,y)
+  for(let i = 0; i < WIDTH/image.width; i++){
+    for(let i = 0; i < HEIGHT/image.height; i++){
+      ctx.drawImage(image,x,y)
+    }
+  }
 }
 
 let lastScore = null

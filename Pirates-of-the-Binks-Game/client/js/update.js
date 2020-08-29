@@ -19,8 +19,6 @@ socket.on('update',function(data){
 
       if(pack.map !== undefined)
         p.map = pack.map
-
-      Player.list[pack.id].draw(Img.player)
     }
   }
 

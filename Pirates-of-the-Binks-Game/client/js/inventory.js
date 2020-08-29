@@ -1,7 +1,7 @@
-Inventory = function(socket,server){
+Inventory = function(items,socket,server){
 
   let self = {
-    items:[],
+    items:items,
     socket:socket,
     server:server,
   }
@@ -9,7 +9,7 @@ Inventory = function(socket,server){
   self.addItem = function(id,amount){
     for(let i = 0; i< self.items.length; i++){
       if(self.items[i].id === id){
-        self.items[i].id
+        self.items[i].amount += amount
         self.refreshRenderer()
         return
       }
@@ -24,7 +24,7 @@ Inventory = function(socket,server){
         self.items[i].amount -= amount
         if(self.items[i].amount <= 0)
           self.items.splice(i,1)
-          self.refreshRenderer()
+        self.refreshRenderer()
         return
       }
     }

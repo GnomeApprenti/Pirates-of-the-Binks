@@ -5,7 +5,7 @@ Img.bullet = new Image()
 Img.bullet.src = '/client/img/bullet.png'
 Img.map = {}
 Img.map['sea'] = new Image()
-Img.map['sea'].src = 'client/img/sea.png'
+Img.map['sea'].src = 'client/img/sea.jpg'
 Img.map['coast'] = new Image()
 Img.map['coast'].src = 'client/img/coast.png'
 

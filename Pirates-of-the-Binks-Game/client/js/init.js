@@ -38,7 +38,7 @@ let Player = function(initPack){
       ctx.save()
       ctx.translate(x+image.width/2, y)
       ctx.rotate(convertToRadian(angle))
-      ctx.drawImage(image, -image.width/2, -image.height/2)
+      ctx.drawImage(image, -image.width/2 - 60, -image.height/2)
       ctx.restore()
     }
     rotate(image)
@@ -60,8 +60,8 @@ let Bullet = function(initPack){
     if(Player.list[selfId].map !== self.map)
       return
 
-    let width = Img.bullet.width/2
-    let height = Img.bullet.height/2
+    let width = Img.bullet.width/70
+    let height = Img.bullet.height/70
 
     let x = self.x - Player.list[selfId].x + WIDTH/2
     let y = self.y - Player.list[selfId].y + HEIGHT/2

@@ -2,11 +2,9 @@
 //initializing server
 //////////////////////////////////////////
 
-let mongojs = require("mongojs")
-let db = mongojs('localhost:27017/PiratesOfTheBinks', ['account','progress'])
-
 require('./entity.js')
 require('./client/js/inventory.js')
+require('./database.js')
 
 let express = require('express')
 let app = express()
@@ -33,31 +31,7 @@ let USERS = {
 
 }
 
-let isValidPassword = function(data,cb){
-  db.account.find({username:data.username,password:data.password},function(err,res){
-    if(res.length > 0){
-      cb(true)
-    } else {
-      cb(false)
-    }
-  })
-}
 
-let isUsernameTaken = function(data,cb){
-  db.account.find({username:data.username},function(err,res){
-    if(res.length > 0){
-      cb(true)
-    } else {
-      cb(false)
-    }
-  })
-}
-
-let addUser = function(data,cb){
-  db.account.insert({username:data.username,password:data.password},function(err){
-    cb()
-  })
-}
 
 let io = require('socket.io')(serv, {})
 io.sockets.on('connection', function(socket){
@@ -67,23 +41,25 @@ io.sockets.on('connection', function(socket){
   SOCKET_LIST[socket.id] = socket
 
   socket.on('signIn',function(data){
-    isValidPassword(data,function(res){
+    Database.isValidPassword(data,function(res){
       if(res){
-        Player.onConnect(socket,data.username)
-        socket.emit('signInResponse',{success:true})
+        Database.getPlayerProgress(data.username,function(progress){
+          Player.onConnect(socket,data.username,progress)
+          socket.emit('signInResponse',{success:true})
+        })
       } else {
-        Player.onConnect(socket,data.username)
-        socket.emit('signInResponse',{success:true})
+        socket.emit('signInResponse',{success:false})// debug mode = true
       }
     })
   })
 
   socket.on('signUp',function(data){
-    isUsernameTaken(data,function(res){
+    Database.isUsernameTaken(data,function(res){
       if(res){
         socket.emit('signUpResponse',{success:false})
       }else{
-        addUser(data,function(){
+        Database.addUser(data,function(){
+          console.log('added user     ' + data);
           socket.emit('signUpResponse',{success:true})
         })
       }
