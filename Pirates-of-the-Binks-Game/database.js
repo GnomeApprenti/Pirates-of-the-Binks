@@ -32,15 +32,17 @@ Database.addUser = function(data,cb){
 }
 
 Database.getPlayerProgress = function(username,cb){
-  return cb({items:[]})
 
-  db.progress.insert({username:data.username},function(err,res){
-    cb({items:res.items})
+  db.progress.findOne({username:username},function(err,res){
+    console.log(res.items + "       (database.js)")
+    if(res.items != null){
+      cb({items:res.items})
+    } else {
+      cb({items:[]})
+    }
   })
 }
 
 Database.savePlayerProgress = function(data,cb){
-  cb = cb || function(){}
-
-  db.progress.update({username:data.username},data,{upsert:true},cb)
+  db.progress.update({username:data.username},{$set:{items:data.items}},{upsert:true},cb)
 }

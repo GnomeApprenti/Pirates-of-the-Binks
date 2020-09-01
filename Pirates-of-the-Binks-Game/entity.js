@@ -258,13 +258,11 @@ Player.getAllInitPack = function(){
 
 Player.onDisconnect = function(socket){
   let player = Player.list[socket.id]
-  if(!player)
-    return
   Database.savePlayerProgress({
-    username:player.username,
-    items:player.inventory.items,
+    username:Player.list[socket.id].username,
+    items:Player.list[socket.id].inventory.items,
   })
-  delete player
+  delete Player.list[socket.id]
   removePack.player.push(socket.id)
 }
 

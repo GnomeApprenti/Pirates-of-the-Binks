@@ -26,12 +26,6 @@ console.log("server started")
 
 const DEBUG = true
 
-let USERS = {
-  "bob":"asd",
-
-}
-
-
 
 let io = require('socket.io')(serv, {})
 io.sockets.on('connection', function(socket){
@@ -42,14 +36,13 @@ io.sockets.on('connection', function(socket){
 
   socket.on('signIn',function(data){
     Database.isValidPassword(data,function(res){
-      if(res){
-        Database.getPlayerProgress(data.username,function(progress){
-          Player.onConnect(socket,data.username,progress)
-          socket.emit('signInResponse',{success:true})
-        })
-      } else {
+      if(!res){
         socket.emit('signInResponse',{success:false})// debug mode = true
       }
+      Database.getPlayerProgress(data.username,function(progress){
+        Player.onConnect(socket,data.username,progress)
+        socket.emit('signInResponse',{success:true})
+      })
     })
   })
 
@@ -59,7 +52,6 @@ io.sockets.on('connection', function(socket){
         socket.emit('signUpResponse',{success:false})
       }else{
         Database.addUser(data,function(){
-          console.log('added user     ' + data);
           socket.emit('signUpResponse',{success:true})
         })
       }

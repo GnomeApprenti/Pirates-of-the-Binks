@@ -64,7 +64,7 @@ Inventory = function(items,socket,server){
       button.innerText = item.name + " x" + data.amount
       inventory.appendChild(button)
       button.onclick = function(){
-        self.socket.emit("useItem",item.id)
+        self.socket.emit('useItem',item.id)
       }
     }
     for(let i = 0; i<self.items.length; i++){
