@@ -34,7 +34,6 @@ Database.addUser = function(data,cb){
 Database.getPlayerProgress = function(username,cb){
 
   db.progress.findOne({username:username},function(err,res){
-    console.log(res.items + "       (database.js)")
     if(res.items != null){
       cb({items:res.items})
     } else {
