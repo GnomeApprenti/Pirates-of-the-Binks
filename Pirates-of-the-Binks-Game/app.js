@@ -38,6 +38,7 @@ io.sockets.on('connection', function(socket){
     Database.isValidPassword(data,function(res){
       if(!res){
         socket.emit('signInResponse',{success:false})// debug mode = true
+        return
       }
       Database.getPlayerProgress(data.username,function(progress){
         Player.onConnect(socket,data.username,progress)
