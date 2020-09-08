@@ -3,6 +3,6 @@
 Created with JS canvas. Multiplayer supported by the socket.io node library. Website coming soon.
 ### Contributors
 * Programmer, game deseigner : Leith 'GnomeApprenti' Chakroun
-* graphic designer : Amaury Castello
+* Graphic designer : Amaury Castello
 
 Pirate ship battles !
